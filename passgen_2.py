@@ -156,7 +156,7 @@ class tabView (ctk.CTkTabview):
         # widgets
         self.spacer = ctk.CTkLabel(       master=self.tab('Save'), text='', height=30)
         self.title_entry = ctk.CTkEntry(  master=self.tab('Save'), placeholder_text='Title', width=400)
-        self.save_button = ctk.CTkButton( master=self.tab('Save'), text='Save', height=40, corner_radius=20, command=self.save, state='disabled')
+        self.save_button = ctk.CTkButton( master=self.tab('Save'), text='Save', font=('Helvetica', 20), text_color_disabled=hover_dict[self.button_color_dropdown.get()], height=40, corner_radius=20, command=self.save, state='disabled')
         self.path_button = ctk.CTkButton( master=self.tab('Save'), text='Choose File', corner_radius=8, command=self.path)
         self.new_file = ctk.CTkButton(    master=self.tab('Save'), text='New File', corner_radius=8, command=self.makeNew)
         self.open_file = ctk.CTkButton(   master=self.tab('Save'), text='Open File', corner_radius=8, command=self.open)
@@ -250,12 +250,18 @@ class tabView (ctk.CTkTabview):
                 widget.configure(text_color=text_dict[choice])
         
         config(self.gen_button,        True)
+
         config(self.check_brackets,    False)
         config(self.check_upper,       False)
         config(self.check_lower,       False)
         config(self.check_numbers,     False)
         config(self.check_punctuation, False)
         config(self.check_symbols,     False)
+
+        config(self.save_button,       True)
+        config(self.open_file,         True)
+        config(self.new_file,          True)
+        config(self.path_button,       True)
 
         # configure the tab button
         self.configure(segmented_button_selected_color=color_dict[choice], segmented_button_selected_hover_color=hover_dict[choice], text_color=text_dict[choice])
