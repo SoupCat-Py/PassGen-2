@@ -15,21 +15,24 @@ color_dict = {'red': '#ff0000',
                'yellow': '#f5ac00',
                'green': '#0fba2e',
                'blue': '#2c62c7',
-               'purple': '#a302a3'}
+               'purple': '#a302a3',
+               'pink' : '#bf0a7d'}
 
 hover_dict = {'red': '#cc0202',
               'orange': '#d94602',
               'yellow': '#d19302',
               'green': '#08751c',
               'blue': '#124982',
-              'purple': '#800080'}
+              'purple': '#800080',
+              'pink' : '#9c0665'}
 
 text_dict = {'red': 'white',
              'orange': 'white',
              'yellow': 'black',
              'green': 'white',
              'blue': 'white',
-             'purple': 'white'}
+             'purple': 'white',
+             'pink' : 'white'}
 
 lower = ['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', 'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', 'z', 'x', 'c', 'v', 'b', 'n', 'm']
 upper = ['Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P', 'A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L', 'Z', 'X', 'C', 'V', 'B', 'N', 'M']
@@ -58,7 +61,6 @@ def writable_path(relative_path):
     return os.path.join(user_data_dir, relative_path)
 
 def initialize_writable_files():
-    # Copy writable files to user directory if not already present.
     files_to_copy = ["settings.txt"]
     for file in files_to_copy:
         source_path = resource_path(file)
@@ -67,6 +69,10 @@ def initialize_writable_files():
             try:
                 with open(source_path, "r") as src, open(dest_path, "w") as dst:
                     dst.write(src.read())
+                
+                # Make file read-only
+                os.chmod(dest_path, 0o444)  # Read-only for all users
+                
             except Exception as e:
                 msg.showerror('Unexpected Error!', f'(line 46) Error copying {file}: {e}')
 
@@ -138,7 +144,7 @@ class tabView (ctk.CTkTabview):
         #
         self.dark_switch = ctk.CTkSwitch(             master=self.tab('Settings'), text='Dark Mode', command=self.switch_var)
         self.button_color_label = ctk.CTkLabel(       master=self.tab('Settings'), text='Button color:')
-        self.button_color_dropdown = ctk.CTkComboBox( master=self.tab('Settings'), values=['red','orange','yellow','green','blue','purple'], command=self.combo_command)
+        self.button_color_dropdown = ctk.CTkComboBox( master=self.tab('Settings'), values=['red','orange','yellow','green','blue','purple', 'pink'], command=self.combo_command)
         
         # set defaults
         self.check_brackets.select()
@@ -193,8 +199,12 @@ class tabView (ctk.CTkTabview):
         settings_path = writable_path('settings.txt')
         with open (settings_path, 'r') as file:
             content = file.read()
-            self.combo_command(content.split(' ')[1])
-            self.button_color_dropdown.set(content.split(' ')[1])
+            try:
+                self.combo_command(content.split(' ')[1])
+                self.button_color_dropdown.set(content.split(' ')[1])
+            except:
+                self.combo_command('blue')
+                self.button_color_dropdown.set('blue')
 
 ########## tab 1 functions ##########
     def copy(self):
@@ -422,6 +432,7 @@ class Main (ctk.CTk):
 
         # setup
         self.title('PassGen 2')
+        self.geometry('500x300')
         self.resizable(False, False)
 
         # set dark mode based on text file
@@ -436,12 +447,17 @@ class Main (ctk.CTk):
                 elif 'light' in content:
                     ctk.set_appearance_mode('light')
                     mode = 'light'
+                else:
+                    ctk.set_appearance_mode('dark')
+                    mode = 'dark'
         except Exception as e:
             msg.showerror('Error!', f'(line 189) Could not open {settings_path}')
 
         # tab view
         self.tab_view = tabView(parent=self)
         self.tab_view.grid(row=0,column=0, padx=10,pady=10)
+        self.tab_view.place(relx=0.5, anchor='center')
+        self.tab_view.place(rely=0, anchor='n')
 
 app = Main()
 app.mainloop()
