@@ -99,7 +99,7 @@ class tabView (ctk.CTkTabview):
             self.password_result = ctk.CTkButton( master=self.tab('Generate'), text='Click to copy', font=('Courier', 30), text_color='black', height=50, fg_color='transparent', hover_color='#B1B1B1', corner_radius=50, command=self.copy)
         self.gen_button = ctk.CTkButton(      master=self.tab('Generate'), text='Generate!', font=('helvetica',15), width=350, height=40, corner_radius=40, command=self.generate)
         self.len_label = ctk.CTkLabel(        master=self.tab('Generate'), text='Length: 16', font=('Courier', 15))
-        self.len_slider = ctk.CTkSlider(      master=self.tab('Generate'), from_=6, to=30, number_of_steps=24, progress_color='white', width=300, command=self.slider_command) # remember to change progress_color depending on value (red - green)
+        self.len_slider = ctk.CTkSlider(      master=self.tab('Generate'), from_=6, to=30, number_of_steps=26, progress_color='white', width=300, command=self.slider_command) # remember to change progress_color depending on value (red - green)
         self.len_slider.set(16) # set default value
         self.slider_command(16) # set the length variable
 
@@ -264,6 +264,11 @@ class tabView (ctk.CTkTabview):
 
             password_var = ''.join(password)  # convert list to string
             self.password_result.configure(text=password_var)
+
+        if length > 24:
+            self.master.changeGeometry()
+        else:
+            self.master.resetGeometry()
 #####################################
 
 ########## tab 2 functions ##########
@@ -458,6 +463,12 @@ class Main (ctk.CTk):
         self.tab_view.grid(row=0,column=0, padx=10,pady=10)
         self.tab_view.place(relx=0.5, anchor='center')
         self.tab_view.place(rely=0, anchor='n')
+
+    def changeGeometry(self):
+        global length
+        self.geometry(f'{20*(length-23)+500}x300')
+    def resetGeometry(self):
+        self.geometry('500x300')
 
 app = Main()
 app.mainloop()
