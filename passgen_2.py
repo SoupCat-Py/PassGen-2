@@ -7,22 +7,22 @@ codes = ['#ff0000', '#ff1b00', '#ff5200', '#ff6e00', '#ffa500', '#ffa500', '#ffc
 
 color_dict = {'red': '#ff0000',
                'orange': '#ff5200',
-               'yellow': '#fff000',
-               'green': '#32dc32',
-               'blue': '#1a5694',
+               'yellow': '#f5ac00',
+               'green': '#0fba2e',
+               'blue': '#165ea8',
                'purple': '#a302a3'}
 
 hover_dict = {'red': '#cc0202',
               'orange': '#d94602',
-              'yellow': '#c2b502',
-              'green': '#21b021',
-              'blue': '#114070',
+              'yellow': '#d19302',
+              'green': '#08751c',
+              'blue': '#124982',
               'purple': '#800080'}
 
 text_dict = {'red': 'white',
              'orange': 'white',
              'yellow': 'black',
-             'green': 'black',
+             'green': 'white',
              'blue': 'white',
              'purple': 'white'}
 
@@ -35,7 +35,6 @@ punctuation = [':', ',', '.', '!', '?']
 lists = []
 
 ##### FILE MANAGEMENT #####
-
 def resource_path(relative_path):
     # Get absolute path to resource, works for dev and for PyInstaller/cx_Freeze.
     try:
@@ -67,18 +66,20 @@ def initialize_writable_files():
                 msg.showerror('Unexpected Error!', f'(line 46) Error copying {file}: {e}')
 
 initialize_writable_files()
-
-###########################
+########################
 
 class tabView (ctk.CTkTabview):
     def __init__(self, parent, **kwargs):
         super().__init__(parent, **kwargs)
 
         # create tabs
-        self.add('Generate')
         self.add('Settings')
+        self.add('Generate')
+        self.add('Save')
+        self.set('Generate')
 
-        # tab 1 widgets
+        ########## tab 1 init ##########
+        # widgets
         global mode
         if mode == 'dark':
             self.password_result = ctk.CTkButton( master=self.tab('Generate'), text='Click to copy', font=('Courier', 30), height=50, fg_color='transparent', hover_color='#404040', corner_radius=50, command=self.copy)
@@ -86,17 +87,19 @@ class tabView (ctk.CTkTabview):
             self.password_result = ctk.CTkButton( master=self.tab('Generate'), text='Click to copy', font=('Courier', 30), text_color='black', height=50, fg_color='transparent', hover_color='#B1B1B1', corner_radius=50, command=self.copy)
         self.gen_button = ctk.CTkButton(      master=self.tab('Generate'), text='Generate!', font=('helvetica',15), width=350, height=40, corner_radius=40, command=self.generate)
         self.len_label = ctk.CTkLabel(        master=self.tab('Generate'), text='Length: 16', font=('Courier', 15))
-        self.len_slider = ctk.CTkSlider(      master=self.tab('Generate'), from_=6, to=30, number_of_steps=24, progress_color='white', command=self.slider_command) # remember to change progress_color depending on value (red - green)
+        self.len_slider = ctk.CTkSlider(      master=self.tab('Generate'), from_=6, to=30, number_of_steps=24, progress_color='white', width=300, command=self.slider_command) # remember to change progress_color depending on value (red - green)
         self.len_slider.set(16) # set default value
         self.slider_command(16) # set the length variable
-        self.save_button = ctk.CTkButton(     master=self.tab('Generate'), text='Save', width=70, height=30, corner_radius=10, command=self.save)
-        # tab 1 placement
-        self.password_result.grid( row=0,column=0, columnspan=3, padx=10,pady=20, sticky='ew')
-        self.gen_button.grid(      row=1,column=0, columnspan=3, padx=10,pady=20)
+
+        # placement
+        self.password_result.grid( row=0,column=0, columnspan=2, padx=10,pady=20, sticky='ew')
+        self.gen_button.grid(      row=1,column=0, columnspan=2, padx=10,pady=20)
         self.len_label.grid(       row=2,column=0,               padx=10,pady=15, sticky='e')
         self.len_slider.grid(      row=2,column=1,               padx=10,pady=15, sticky='w')
-        self.save_button.grid(     row=2,column=2,               padx=10,pady=15)
+        ################################
 
+
+        ########## tab 2 init ##########
         # vars for settings
         global lower_var, upper_var, numbers_var, symbols_var, punctuation_var, brackets_var
         upper_var = ctk.StringVar(value=True)
@@ -105,7 +108,8 @@ class tabView (ctk.CTkTabview):
         symbols_var = ctk.StringVar(value=True)
         punctuation_var = ctk.StringVar(value=True)
         brackets_var = ctk.StringVar(value=True)
-        # tab 2 widgets
+
+        # widgets
         self.check_lower = ctk.CTkCheckBox(       master=self.tab('Settings'), text='Letters (lower)', variable=lower_var)
         self.check_upper = ctk.CTkCheckBox(       master=self.tab('Settings'), text='Letters (upper)', variable=upper_var)
         self.check_numbers = ctk.CTkCheckBox(     master=self.tab('Settings'), text='Numbers', variable=numbers_var)
@@ -116,6 +120,7 @@ class tabView (ctk.CTkTabview):
         self.dark_switch = ctk.CTkSwitch(               master=self.tab('Settings'), text='Dark Mode', command=self.switch_var)
         self.button_color_label = ctk.CTkLabel(         master=self.tab('Settings'), text='Button color:')
         self.button_color_dropdown = ctk.CTkComboBox( master=self.tab('Settings'), values=['red','orange','yellow','green','blue','purple'], command=self.combo_command)
+        
         # set defaults
         self.check_brackets.select()
         self.check_upper.select()
@@ -128,7 +133,8 @@ class tabView (ctk.CTkTabview):
         elif mode == 'light':
             self.dark_switch.deselect()
         self.button_color_dropdown.set('blue')
-        # tab 2 placement
+
+        # placement
         self.check_upper.grid(       row=0,column=0, padx=10,pady=10, sticky='ew')
         self.check_lower.grid(       row=1,column=0, padx=10,pady=10, sticky='ew')
         self.check_numbers.grid(     row=2,column=0, padx=10,pady=10, sticky='ew')
@@ -139,8 +145,32 @@ class tabView (ctk.CTkTabview):
         self.dark_switch.grid(       row=0,column=2, padx=20,pady=10, sticky='ew')
         self.button_color_label.grid(row=1,column=2, padx=20,pady=5,  sticky='sew')
         self.button_color_dropdown.grid(row=2,column=2, padx=20,pady=5, sticky='new')
+        ################################
 
-# tab 1 functions
+
+        ########## tab 3 init ##########
+        # widgets
+        self.title_entry = ctk.CTkEntry(master=self.tab('Save'), placeholder_text='Title', width=250)
+        self.tooltip = ctk.CTkButton(master=self.tab('Save'), text='?', width=40)
+        self.save_button = ctk.CTkButton(master=self.tab('Save'), text='Save', corner_radius=20, command=self.save)
+
+        # placement
+        self.title_entry.grid(row=0,column=0, padx=10,pady=10, sticky='ew')
+        self.tooltip.grid(row=0,column=1, padx=5,pady=10, sticky='w')
+        self.save_button.grid(row=1,column=0, columnspan=2, padx=10,pady=10, sticky='nsew')
+
+
+
+
+        # set color based on file
+        settings_path = writable_path('settings.txt')
+        with open (settings_path, 'r') as file:
+            content = file.read()
+            self.combo_command(content.split(' ')[1])
+            self.button_color_dropdown.set(content.split(' ')[1])
+
+########## functions ##########
+########## tab 1 ##########
     def copy(self):
         global mode
         temp = self.password_result.cget('text')
@@ -151,9 +181,6 @@ class tabView (ctk.CTkTabview):
                 self.after(750, lambda: self.password_result.configure(text=temp, text_color='white'))
             elif mode == 'light':
                 self.after(750, lambda: self.password_result.configure(text=temp, text_color='black'))
-
-    def save(self):
-        print('saved')
 
     # when the slider is updated
     def slider_command(self, value):
@@ -196,9 +223,9 @@ class tabView (ctk.CTkTabview):
 
             password_var = ''.join(password)  # convert list to string
             self.password_result.configure(text=password_var)
-        
+###########################
 
-# tab 2 functions
+########## tab 2 ##########
     global lower_var, upper_var, numbers_var, symbols_var, punctuation_var, brackets_var
 
     def combo_command(self,choice):
@@ -209,7 +236,6 @@ class tabView (ctk.CTkTabview):
                 widget.configure(text_color=text_dict[choice])
         
         config(self.gen_button,        True)
-        config(self.save_button,       True)
         config(self.check_brackets,    False)
         config(self.check_upper,       False)
         config(self.check_lower,       False)
@@ -221,6 +247,13 @@ class tabView (ctk.CTkTabview):
         self.configure(segmented_button_selected_color=color_dict[choice], segmented_button_selected_hover_color=hover_dict[choice], text_color=text_dict[choice])
         # configure the switch
         self.dark_switch.configure(progress_color=color_dict[choice])
+
+        # write in file
+        settings_path = writable_path('settings.txt')
+        with open (settings_path, 'r') as file:
+            content = file.read()
+            with open (settings_path, 'w') as file:
+                file.write(content.replace(content.split(' ')[1], choice))
 
     def switch_var(self):
         global mode
@@ -240,10 +273,18 @@ class tabView (ctk.CTkTabview):
                 mode = 'light'
                 with open (settings_path, 'w') as file:
                     file.write(content.replace('dark','light'))
+###########################
+
+########## tab 3 ##########
+    def save(self):
+        title = self.title_entry.get()
+        password = self.password_result.cget('text')
+
+        # get the path to the file (this may be difficult)
 
 
 
-class App (ctk.CTk):
+class Main (ctk.CTk):
     def __init__(self):
         super().__init__()
 
@@ -270,6 +311,6 @@ class App (ctk.CTk):
         self.tab_view = tabView(parent=self)
         self.tab_view.grid(row=0,column=0, padx=10,pady=10)
 
-app = App()
+app = Main()
 app.mainloop()
 os._exit(0)
