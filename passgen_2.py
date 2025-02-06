@@ -116,18 +116,18 @@ class tabView (ctk.CTkTabview):
         self.dark_switch = ctk.CTkSwitch(               master=self.tab('Settings'), text='Dark Mode', command=self.switch_var)
         self.button_color_label = ctk.CTkLabel(         master=self.tab('Settings'), text='Button color:')
         self.button_color_dropdown = ctk.CTkComboBox( master=self.tab('Settings'), values=['red','orange','yellow','green','blue','purple'], command=self.combo_command)
-        # set all checkboxes by default (in order of suggestions bc i'm lazy)
+        # set defaults
         self.check_brackets.select()
         self.check_upper.select()
         self.check_lower.select()
         self.check_numbers.select()
         self.check_punctuation.select()
         self.check_symbols.select()
-        # set dark mode switch depending on file
         if mode == 'dark':
             self.dark_switch.select()
         elif mode == 'light':
             self.dark_switch.deselect()
+        self.button_color_dropdown.set('blue')
         # tab 2 placement
         self.check_upper.grid(       row=0,column=0, padx=10,pady=10, sticky='ew')
         self.check_lower.grid(       row=1,column=0, padx=10,pady=10, sticky='ew')
