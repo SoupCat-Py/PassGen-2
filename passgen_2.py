@@ -1,7 +1,11 @@
 import tkinter.messagebox as msg
+from tkinter import filedialog
 import customtkinter as ctk
 import pyperclip as ppc
 import random, os, sys
+
+global path
+path = None
 
 codes = ['#ff0000', '#ff1b00', '#ff5200', '#ff6e00', '#ffa500', '#ffa500', '#ffc300', '#ffd200',  '#fff000', '#ffff00', '#e1f707', '#c4f00e', '#89e21c', '#6cdb23', '#32cd32', '#32cd32', '#32cd32', '#32cd32', '#32cd32', '#32cd32', '#32cd32', '#32cd32', '#32cd32']
 
@@ -117,8 +121,8 @@ class tabView (ctk.CTkTabview):
         self.check_punctuation = ctk.CTkCheckBox( master=self.tab('Settings'), text='Punctuation', variable=punctuation_var)
         self.check_brackets = ctk.CTkCheckBox(    master=self.tab('Settings'), text='Brackets', variable=brackets_var)
         #
-        self.dark_switch = ctk.CTkSwitch(               master=self.tab('Settings'), text='Dark Mode', command=self.switch_var)
-        self.button_color_label = ctk.CTkLabel(         master=self.tab('Settings'), text='Button color:')
+        self.dark_switch = ctk.CTkSwitch(             master=self.tab('Settings'), text='Dark Mode', command=self.switch_var)
+        self.button_color_label = ctk.CTkLabel(       master=self.tab('Settings'), text='Button color:')
         self.button_color_dropdown = ctk.CTkComboBox( master=self.tab('Settings'), values=['red','orange','yellow','green','blue','purple'], command=self.combo_command)
         
         # set defaults
@@ -142,22 +146,30 @@ class tabView (ctk.CTkTabview):
         self.check_punctuation.grid( row=1,column=1, padx=10,pady=10, sticky='ew')
         self.check_brackets.grid(    row=2,column=1, padx=10,pady=10, sticky='ew')
         #
-        self.dark_switch.grid(       row=0,column=2, padx=20,pady=10, sticky='ew')
-        self.button_color_label.grid(row=1,column=2, padx=20,pady=5,  sticky='sew')
-        self.button_color_dropdown.grid(row=2,column=2, padx=20,pady=5, sticky='new')
+        self.dark_switch.grid(           row=0,column=2, padx=20,pady=10, sticky='ew')
+        self.button_color_label.grid(    row=1,column=2, padx=20,pady=5,  sticky='sew')
+        self.button_color_dropdown.grid( row=2,column=2, padx=20,pady=5, sticky='new')
         ################################
 
 
         ########## tab 3 init ##########
         # widgets
-        self.title_entry = ctk.CTkEntry(master=self.tab('Save'), placeholder_text='Title', width=250)
-        self.tooltip = ctk.CTkButton(master=self.tab('Save'), text='?', width=40)
-        self.save_button = ctk.CTkButton(master=self.tab('Save'), text='Save', corner_radius=20, command=self.save)
+        self.spacer = ctk.CTkLabel(       master=self.tab('Save'), text='', height=30)
+        self.title_entry = ctk.CTkEntry(  master=self.tab('Save'), placeholder_text='Title', width=400)
+        self.save_button = ctk.CTkButton( master=self.tab('Save'), text='Save', height=40, corner_radius=20, command=self.save, state='disabled')
+        self.path_button = ctk.CTkButton( master=self.tab('Save'), text='Choose File', corner_radius=8, command=self.path)
+        self.new_file = ctk.CTkButton(    master=self.tab('Save'), text='New File', corner_radius=8, command=self.makeNew)
+        self.open_file = ctk.CTkButton(   master=self.tab('Save'), text='Open File', corner_radius=8, command=self.open)
+        self.path_label = ctk.CTkLabel(   master=self.tab('Save'), text='no file path chosen', font=('Courier', 10))
 
         # placement
-        self.title_entry.grid(row=0,column=0, padx=10,pady=10, sticky='ew')
-        self.tooltip.grid(row=0,column=1, padx=5,pady=10, sticky='w')
-        self.save_button.grid(row=1,column=0, columnspan=2, padx=10,pady=10, sticky='nsew')
+        self.spacer.grid(      row=0,column=0, columnspan=3, sticky='ew')
+        self.title_entry.grid( row=1,column=0, columnspan=3, padx=10,pady=10, sticky='ew')
+        self.save_button.grid( row=2,column=0, columnspan=3, padx=10,pady=10, sticky='nsew')
+        self.path_button.grid( row=3,column=0,               padx=10,pady=10, sticky='ew')
+        self.new_file.grid(    row=3,column=1,               padx=5,pady=10, sticky='ew')
+        self.open_file.grid(   row=3,column=2,               padx=5,pady=10, sticky='ew')
+        self.path_label.grid(  row=4,column=0, columnspan=3, padx=10,pady=10, sticky='sew')
 
 
 
@@ -169,8 +181,7 @@ class tabView (ctk.CTkTabview):
             self.combo_command(content.split(' ')[1])
             self.button_color_dropdown.set(content.split(' ')[1])
 
-########## functions ##########
-########## tab 1 ##########
+########## tab 1 functions ##########
     def copy(self):
         global mode
         temp = self.password_result.cget('text')
@@ -199,6 +210,9 @@ class tabView (ctk.CTkTabview):
 
     def generate(self):
         global length, lists
+
+        self.save_button.configure(state='normal')  # enable save button
+
         password = []  # reset password
         lists = []  # reset lists
 
@@ -223,9 +237,9 @@ class tabView (ctk.CTkTabview):
 
             password_var = ''.join(password)  # convert list to string
             self.password_result.configure(text=password_var)
-###########################
+#####################################
 
-########## tab 2 ##########
+########## tab 2 functions ##########
     global lower_var, upper_var, numbers_var, symbols_var, punctuation_var, brackets_var
 
     def combo_command(self,choice):
@@ -273,14 +287,99 @@ class tabView (ctk.CTkTabview):
                 mode = 'light'
                 with open (settings_path, 'w') as file:
                     file.write(content.replace('dark','light'))
-###########################
+#####################################
 
-########## tab 3 ##########
+########## tab 3 funcitons ##########
     def save(self):
+        global path
         title = self.title_entry.get()
         password = self.password_result.cget('text')
 
-        # get the path to the file (this may be difficult)
+        def write():
+            with open(path, 'w') as file:
+                file.write(f'{title}\n')
+                file.write(f'{password}\n')
+                file.write('-'*40 + '\n')
+            self.title_entry.delete(0, 'end')
+            self.save_button.configure(text='Password Saved!', text_color='#00FF00')
+            self.after(1000, lambda: self.save_button.configure(text='Save', text_color=text_dict[self.button_color_dropdown.get()]))
+
+
+        if path is not None:
+            write()
+        else:
+            self.path()
+            if path is not None:
+                write()
+            else:
+                pass
+
+    def path(self):
+        global path
+        try:
+            new_path = filedialog.askopenfilename(
+                title="Select a File",
+                filetypes=(("Text Files", "*.txt"), ("All Files", "*.*"))
+            )
+            if new_path:
+                path = new_path
+        except Exception as e:
+            msg.showerror("Unexpected Error!", f"error occured {e}")
+        finally:
+            if path is not None:
+                if '.txt' not in path:
+                    msg.showerror('Error!', 'Please select a .txt file')
+                    path = None
+            else:
+                pass
+            self.path_label.configure(text=f'Current path: {path}')
+
+    def open(self):
+        global path
+        if path is not None:
+            os.startfile(path)
+
+    def makeNew(self):
+        global path
+
+        # make initial name
+        newFileName = defaultFileName = 'passwords'
+        self.new_file.configure(text='Generating file...', text_color='yellow')
+
+        def join(name):
+            newPath = os.path.join(os.path.expanduser('~/Downloads'), f'{name}.txt')
+            return newPath
+
+        # check if file is already in user's downloads
+        def check():
+            pathCheck = join(newFileName)
+            if os.path.exists(pathCheck):
+                exists = True
+            else:
+                exists = False
+            return exists
+    
+        exists = check()
+        if exists:
+            index = 1
+        while exists:
+            newFileName = f'{defaultFileName}({index})'
+            exists = check()
+            index += 1
+
+        # set path with new name
+        newPath = join(newFileName)
+
+        # open file and show new path
+        newFile = open(newPath, 'a')
+        path = newPath
+        self.path_label.configure(text=f'Current path: {path}')
+
+        # confirm to user
+        def reset_confirm():
+            self.new_file.configure(text='New File', text_color='white')
+        self.new_file.configure(text=f'created {newFileName}', text_color='#32dc32')
+        self.after(2000, reset_confirm)
 
 
 
