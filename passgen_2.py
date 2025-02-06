@@ -5,7 +5,7 @@ import random, os, sys
 
 codes = ['#ff0000', '#ff1b00', '#ff5200', '#ff6e00', '#ffa500', '#ffa500', '#ffc300', '#ffd200',  '#fff000', '#ffff00', '#e1f707', '#c4f00e', '#89e21c', '#6cdb23', '#32cd32', '#32cd32', '#32cd32', '#32cd32', '#32cd32', '#32cd32', '#32cd32', '#32cd32', '#32cd32']
 
-colour_dict = {'red': '#ff0000',
+color_dict = {'red': '#ff0000',
                'orange': '#ff5200',
                'yellow': '#fff000',
                'green': '#32dc32',
@@ -202,9 +202,8 @@ class tabView (ctk.CTkTabview):
     global lower_var, upper_var, numbers_var, symbols_var, punctuation_var, brackets_var
 
     def combo_command(self,choice):
-        print(choice)
         def config(widget, text):
-            widget.configure(fg_color=colour_dict[choice])
+            widget.configure(fg_color=color_dict[choice])
             widget.configure(hover_color=hover_dict[choice])
             if text:
                 widget.configure(text_color=text_dict[choice])
@@ -217,7 +216,11 @@ class tabView (ctk.CTkTabview):
         config(self.check_numbers,     False)
         config(self.check_punctuation, False)
         config(self.check_symbols,     False)
-        
+
+        # configure the tab button
+        self.configure(segmented_button_selected_color=color_dict[choice], segmented_button_selected_hover_color=hover_dict[choice], text_color=text_dict[choice])
+        # configure the switch
+        self.dark_switch.configure(progress_color=color_dict[choice])
 
     def switch_var(self):
         global mode
@@ -227,11 +230,13 @@ class tabView (ctk.CTkTabview):
             content = file.read()                      #
             if value == 1:
                 ctk.set_appearance_mode('dark')
+                self.password_result.configure(text_color='white', hover_color='#404040')
                 mode = 'dark'
                 with open (settings_path, 'w') as file:
                     file.write(content.replace('light','dark'))
             elif value == 0:
                 ctk.set_appearance_mode('light')
+                self.password_result.configure(text_color='black', hover_color='#B1B1B1')
                 mode = 'light'
                 with open (settings_path, 'w') as file:
                     file.write(content.replace('dark','light'))
