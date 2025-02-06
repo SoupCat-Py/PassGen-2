@@ -2,6 +2,7 @@ import tkinter.messagebox as msg
 from tkinter import filedialog
 import customtkinter as ctk
 import pyperclip as ppc
+import tkinter as tk
 import random, os, sys
 
 global path
@@ -13,7 +14,7 @@ color_dict = {'red': '#ff0000',
                'orange': '#ff5200',
                'yellow': '#f5ac00',
                'green': '#0fba2e',
-               'blue': '#165ea8',
+               'blue': '#2c62c7',
                'purple': '#a302a3'}
 
 hover_dict = {'red': '#cc0202',
@@ -72,6 +73,7 @@ def initialize_writable_files():
 initialize_writable_files()
 ########################
 
+# tabview class
 class tabView (ctk.CTkTabview):
     def __init__(self, parent, **kwargs):
         super().__init__(parent, **kwargs)
@@ -100,6 +102,19 @@ class tabView (ctk.CTkTabview):
         self.gen_button.grid(      row=1,column=0, columnspan=2, padx=10,pady=20)
         self.len_label.grid(       row=2,column=0,               padx=10,pady=15, sticky='e')
         self.len_slider.grid(      row=2,column=1,               padx=10,pady=15, sticky='w')
+
+        # context menu
+        global context_menu
+        def show_context_menu(event):
+            # Popup the menu at mouse click position
+            context_menu.post(event.x_root, event.y_root)
+        context_menu = tk.Menu(self, tearoff=0)
+        context_menu.add_command(label='Copy', command=self.copy, state='disabled')
+        context_menu.add_command(label='Save', command=self.save, state='disabled')
+        if sys.platform == 'darwin': # macOS
+            self.password_result.bind('<Button-2>', show_context_menu)
+        else: # windows and linux
+            self.password_result.bind('<Button-3>', show_context_menu)
         ################################
 
 
@@ -159,7 +174,7 @@ class tabView (ctk.CTkTabview):
         self.save_button = ctk.CTkButton( master=self.tab('Save'), text='Save', font=('Helvetica', 20), text_color_disabled=hover_dict[self.button_color_dropdown.get()], height=40, corner_radius=20, command=self.save, state='disabled')
         self.path_button = ctk.CTkButton( master=self.tab('Save'), text='Choose File', corner_radius=8, command=self.path)
         self.new_file = ctk.CTkButton(    master=self.tab('Save'), text='New File', corner_radius=8, command=self.makeNew)
-        self.open_file = ctk.CTkButton(   master=self.tab('Save'), text='Open File', corner_radius=8, command=self.open)
+        self.open_file = ctk.CTkButton(   master=self.tab('Save'), text='Open File', corner_radius=8, command=self.open, state='disabled', text_color_disabled=hover_dict[self.button_color_dropdown.get()])
         self.path_label = ctk.CTkLabel(   master=self.tab('Save'), text='no file path chosen', font=('Courier', 10))
 
         # placement
@@ -209,9 +224,11 @@ class tabView (ctk.CTkTabview):
             pass
 
     def generate(self):
-        global length, lists
+        global length, lists, context_menu
 
         self.save_button.configure(state='normal')  # enable save button
+        context_menu.entryconfig('Copy', state='normal')  #
+        context_menu.entryconfig('Save', state='normal')  # enabled context menu
 
         password = []  # reset password
         lists = []  # reset lists
@@ -302,7 +319,7 @@ class tabView (ctk.CTkTabview):
         password = self.password_result.cget('text')
 
         def write():
-            with open(path, 'w') as file:
+            with open(path, 'a') as file:
                 file.write(f'{title}\n')
                 file.write(f'{password}\n')
                 file.write('-'*40 + '\n')
@@ -336,6 +353,8 @@ class tabView (ctk.CTkTabview):
                 if '.txt' not in path:
                     msg.showerror('Error!', 'Please select a .txt file')
                     path = None
+                elif '.txt' in path:
+                    self.open_file.configure(state='normal')
             else:
                 pass
             self.path_label.configure(text=f'Current path: {path}')
@@ -343,7 +362,14 @@ class tabView (ctk.CTkTabview):
     def open(self):
         global path
         if path is not None:
-            os.startfile(path)
+            if sys.platform in ('win32', 'cygwin', 'msys', 'win64'): # windows
+                os.startfile(path)
+            elif sys.platform == 'darwin': # macOS
+                import subprocess
+                subprocess.Popen(['open', path])
+            else: #linux
+                subprocess.Popen(["xdg-open", file_path])
+
 
     def makeNew(self):
         global path
@@ -386,6 +412,7 @@ class tabView (ctk.CTkTabview):
             self.new_file.configure(text='New File', text_color='white')
         self.new_file.configure(text=f'created {newFileName}', text_color='#32dc32')
         self.after(2000, reset_confirm)
+#####################################
 
 
 
