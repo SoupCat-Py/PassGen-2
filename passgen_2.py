@@ -61,7 +61,8 @@ def writable_path(relative_path):
     return os.path.join(user_data_dir, relative_path)
 
 def initialize_writable_files():
-    files_to_copy = ["settings.txt"]
+    # Copy writable files to user directory if not already present.
+    files_to_copy = ['settings.txt']
     for file in files_to_copy:
         source_path = resource_path(file)
         dest_path = writable_path(file)
@@ -69,12 +70,8 @@ def initialize_writable_files():
             try:
                 with open(source_path, "r") as src, open(dest_path, "w") as dst:
                     dst.write(src.read())
-                
-                # Make file read-only
-                os.chmod(dest_path, 0o444)  # Read-only for all users
-                
             except Exception as e:
-                msg.showerror('Unexpected Error!', f'(line 46) Error copying {file}: {e}')
+                msg.showerror('Unexpected Error!', f'Error copying {file}: {e}')
 
 initialize_writable_files()
 ########################
@@ -121,12 +118,13 @@ class tabView (ctk.CTkTabview):
             self.password_result.bind('<Button-2>', show_context_menu)
         else: # windows and linux
             self.password_result.bind('<Button-3>', show_context_menu)
+
         ################################
 
 
         ########## tab 2 init ##########
         # vars for settings
-        global lower_var, upper_var, numbers_var, symbols_var, punctuation_var, brackets_var
+        global lower_var, upper_var, numbers_var, symbols_var, punctuation_var, brackets_var, list_dict
         upper_var = ctk.StringVar(value=True)
         lower_var = ctk.StringVar(value=True)
         numbers_var = ctk.StringVar(value=True)
@@ -178,20 +176,16 @@ class tabView (ctk.CTkTabview):
         self.spacer = ctk.CTkLabel(       master=self.tab('Save'), text='', height=30)
         self.title_entry = ctk.CTkEntry(  master=self.tab('Save'), placeholder_text='Title', width=400)
         self.save_button = ctk.CTkButton( master=self.tab('Save'), text='Save', font=('Helvetica', 20), text_color_disabled=hover_dict[self.button_color_dropdown.get()], height=40, corner_radius=20, command=self.save, state='disabled')
-        self.path_button = ctk.CTkButton( master=self.tab('Save'), text='Choose File', corner_radius=8, command=self.path)
-        self.new_file = ctk.CTkButton(    master=self.tab('Save'), text='New File', corner_radius=8, command=self.makeNew)
-        self.open_file = ctk.CTkButton(   master=self.tab('Save'), text='Open File', corner_radius=8, command=self.open, state='disabled', text_color_disabled=hover_dict[self.button_color_dropdown.get()])
+        self.file_button = ctk.CTkButton( master=self.tab('Save'), text='File...', width=75, command=self.expand_button)
+        self.fileSegButton = ctk.CTkSegmentedButton(master = self.tab('Save'), values=['New','Choose'], command=self.segCallback)
         self.path_label = ctk.CTkLabel(   master=self.tab('Save'), text='no file path chosen', font=('Courier', 10))
 
         # placement
-        self.spacer.grid(      row=0,column=0, columnspan=3, sticky='ew')
-        self.title_entry.grid( row=1,column=0, columnspan=3, padx=10,pady=10, sticky='ew')
-        self.save_button.grid( row=2,column=0, columnspan=3, padx=10,pady=10, sticky='nsew')
-        self.path_button.grid( row=3,column=0,               padx=10,pady=10, sticky='ew')
-        self.new_file.grid(    row=3,column=1,               padx=5,pady=10, sticky='ew')
-        self.open_file.grid(   row=3,column=2,               padx=5,pady=10, sticky='ew')
-        self.path_label.grid(  row=4,column=0, columnspan=3, padx=10,pady=10, sticky='sew')
-
+        self.spacer.grid(      row=0,column=0, sticky='ew')
+        self.title_entry.grid( row=1,column=0, padx=10,pady=10, sticky='ew')
+        self.save_button.grid( row=2,column=0, padx=10,pady=10, sticky='nsew')
+        self.file_button.grid( row=3,column=0, padx=10,pady=10)
+        self.path_label.grid(  row=4,column=0, padx=10,pady=10, sticky='sew')
 
 
 
@@ -234,7 +228,7 @@ class tabView (ctk.CTkTabview):
             pass
 
     def generate(self):
-        global length, lists, context_menu
+        global length, lists, context_menu, list_dict
 
         self.save_button.configure(state='normal')  # enable save button
         context_menu.entryconfig('Copy', state='normal')  #
@@ -269,6 +263,7 @@ class tabView (ctk.CTkTabview):
             self.master.changeGeometry()
         else:
             self.master.resetGeometry()
+
 #####################################
 
 ########## tab 2 functions ##########
@@ -291,14 +286,12 @@ class tabView (ctk.CTkTabview):
         config(self.check_symbols,     False)
 
         config(self.save_button,       True)
-        config(self.open_file,         True)
-        config(self.new_file,          True)
-        config(self.path_button,       True)
+        config(self.file_button,       True)
 
-        # configure the tab button
+        # special color configurations
         self.configure(segmented_button_selected_color=color_dict[choice], segmented_button_selected_hover_color=hover_dict[choice], text_color=text_dict[choice])
-        # configure the switch
         self.dark_switch.configure(progress_color=color_dict[choice])
+        self.fileSegButton.configure(unselected_hover_color=color_dict[choice], text_color=text_dict[choice])
 
         # write in file
         settings_path = writable_path('settings.txt')
@@ -328,6 +321,39 @@ class tabView (ctk.CTkTabview):
 #####################################
 
 ########## tab 3 funcitons ##########
+    def expand_button(self):
+        w = self.file_button.cget('width')           #
+        segw = self.fileSegButton.cget('width')      # get some params that i'll need
+        options = self.fileSegButton.cget('values')  #
+        # expand:
+        if (w < (segw-50) and 'Open' not in options) or (w < (segw-10) and 'Open' in options):
+            self.file_button.configure(width=w+1)
+            self.after(1, self.expand_button)
+        # switch to segmented button
+        elif (w == (segw-50) and 'Open' not in options) or (w == (segw-10) and 'Open' in options):
+            self.file_button.grid_forget()
+            self.fileSegButton.grid(row=3,column=0,padx=10,pady=10)
+
+    def collapse_button(self):
+        # switch to button
+        self.fileSegButton.grid_forget()
+        self.file_button.grid(row=3,column=0,padx=10,pady=10)
+        w = self.file_button.cget('width')
+        # collapse
+        if w > 75:
+            self.file_button.configure(width=w-1, text_color=text_dict[self.button_color_dropdown.get()])
+            self.after(1, self.collapse_button)
+
+    def segCallback(self, value):
+        if value == 'New':
+            self.makeNew()
+        if value == 'Choose':
+            self.path()
+        if value == 'Open':
+            self.open()
+        self.fileSegButton.set('none')
+        self.collapse_button()
+
     def save(self):
         global path
         title = self.title_entry.get()
@@ -339,8 +365,8 @@ class tabView (ctk.CTkTabview):
                 file.write(f'{password}\n')
                 file.write('-'*40 + '\n')
             self.title_entry.delete(0, 'end')
-            self.save_button.configure(text='Password Saved!', text_color='#00FF00')
-            self.after(1000, lambda: self.save_button.configure(text='Save', text_color=text_dict[self.button_color_dropdown.get()]))
+            self.save_button.configure(text='Password Saved!')
+            self.after(1000, lambda: self.save_button.configure(text='Save'))
 
 
         if path is not None:
@@ -369,7 +395,9 @@ class tabView (ctk.CTkTabview):
                     msg.showerror('Error!', 'Please select a .txt file')
                     path = None
                 elif '.txt' in path:
-                    self.open_file.configure(state='normal')
+                    options = self.fileSegButton.cget('values')
+                    if 'Open' not in options:
+                        self.fileSegButton.insert(2,'Open')
             else:
                 pass
             self.path_label.configure(text=f'Current path: {path}')
@@ -391,7 +419,6 @@ class tabView (ctk.CTkTabview):
 
         # make initial name
         newFileName = defaultFileName = 'passwords'
-        self.new_file.configure(text='Generating file...', text_color='yellow')
 
         def join(name):
             newPath = os.path.join(os.path.expanduser('~/Downloads'), f'{name}.txt')
@@ -423,10 +450,11 @@ class tabView (ctk.CTkTabview):
         self.path_label.configure(text=f'Current path: {path}')
 
         # confirm to user
-        def reset_confirm():
-            self.new_file.configure(text='New File', text_color='white')
-        self.new_file.configure(text=f'created {newFileName}', text_color='#32dc32')
-        self.after(2000, reset_confirm)
+        self.file_button.configure(text='Done')
+        self.after(2000, lambda: self.file_button.configure(text='File...'))
+        options = self.fileSegButton.cget('values')
+        if 'Open' not in options:
+            self.fileSegButton.insert(2,'Open')
 #####################################
 
 
