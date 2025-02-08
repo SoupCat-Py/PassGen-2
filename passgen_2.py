@@ -87,7 +87,7 @@ class tabView (ctk.CTkTabview):
         self.add('Save')
         self.set('Generate')
 
-        ########## tab 1 init ##########
+        ########## gen tab init ##########
         # widgets
         global mode
         if mode == 'dark':
@@ -122,7 +122,7 @@ class tabView (ctk.CTkTabview):
         ################################
 
 
-        ########## tab 2 init ##########
+        ########## settings tab init ##########
         # vars for settings
         global lower_var, upper_var, numbers_var, symbols_var, punctuation_var, brackets_var, list_dict
         upper_var = ctk.StringVar(value=True)
@@ -133,12 +133,16 @@ class tabView (ctk.CTkTabview):
         brackets_var = ctk.StringVar(value=True)
 
         # widgets
+        self.title_gen = ctk.CTkLabel(            master=self.tab('Settings'), text='Password settings:', font=('Courier', 20))
+        self.title_cust = ctk.CTkLabel(           master=self.tab('Settings'), text='Customization:', font=('Courier', 20))
         self.check_lower = ctk.CTkCheckBox(       master=self.tab('Settings'), text='Letters (lower)', variable=lower_var)
         self.check_upper = ctk.CTkCheckBox(       master=self.tab('Settings'), text='Letters (upper)', variable=upper_var)
         self.check_numbers = ctk.CTkCheckBox(     master=self.tab('Settings'), text='Numbers', variable=numbers_var)
         self.check_symbols = ctk.CTkCheckBox(     master=self.tab('Settings'), text='Symbols', variable=symbols_var)
         self.check_punctuation = ctk.CTkCheckBox( master=self.tab('Settings'), text='Punctuation', variable=punctuation_var)
         self.check_brackets = ctk.CTkCheckBox(    master=self.tab('Settings'), text='Brackets', variable=brackets_var)
+        #
+        self.spacer2 = ctk.CTkLabel(master=self.tab('Settings'), text='|', font=('Times New Roman',140), text_color='#7F7F7F')
         #
         self.dark_switch = ctk.CTkSwitch(             master=self.tab('Settings'), text='Dark Mode', command=self.switch_var)
         self.button_color_label = ctk.CTkLabel(       master=self.tab('Settings'), text='Button color:')
@@ -158,20 +162,24 @@ class tabView (ctk.CTkTabview):
         self.button_color_dropdown.set('blue')
 
         # placement
-        self.check_upper.grid(       row=0,column=0, padx=10,pady=10, sticky='ew')
-        self.check_lower.grid(       row=1,column=0, padx=10,pady=10, sticky='ew')
-        self.check_numbers.grid(     row=2,column=0, padx=10,pady=10, sticky='ew')
-        self.check_symbols.grid(     row=0,column=1, padx=10,pady=10, sticky='ew')
-        self.check_punctuation.grid( row=1,column=1, padx=10,pady=10, sticky='ew')
-        self.check_brackets.grid(    row=2,column=1, padx=10,pady=10, sticky='ew')
+        self.title_gen.grid(         row=0,column=0, padx=10,pady=20, sticky='ew', columnspan=2)
+        self.check_upper.grid(       row=1,column=0, padx=6,pady=10, sticky='ew')
+        self.check_lower.grid(       row=2,column=0, padx=6,pady=10, sticky='ew')
+        self.check_numbers.grid(     row=3,column=0, padx=6,pady=10, sticky='ew')
+        self.check_symbols.grid(     row=1,column=1, padx=6,pady=10, sticky='ew')
+        self.check_punctuation.grid( row=2,column=1, padx=6,pady=10, sticky='ew')
+        self.check_brackets.grid(    row=3,column=1, padx=6,pady=10, sticky='ew')
         #
-        self.dark_switch.grid(           row=0,column=2, padx=20,pady=10, sticky='ew')
-        self.button_color_label.grid(    row=1,column=2, padx=20,pady=5,  sticky='sew')
-        self.button_color_dropdown.grid( row=2,column=2, padx=20,pady=5, sticky='new')
+        self.spacer2.grid(row=0,column=3, rowspan=4, sticky='s')
+        #
+        self.title_cust.grid(            row=0,column=4, padx=10,pady=20, sticky='ew')
+        self.dark_switch.grid(           row=1,column=4, padx=10,pady=10, sticky='ew')
+        self.button_color_label.grid(    row=2,column=4, padx=10,pady=5,  sticky='sew')
+        self.button_color_dropdown.grid( row=3,column=4, padx=10,pady=5,  sticky='new')
         ################################
 
 
-        ########## tab 3 init ##########
+        ########## save tab init ##########
         # widgets
         self.spacer = ctk.CTkLabel(       master=self.tab('Save'), text='', height=30)
         self.title_entry = ctk.CTkEntry(  master=self.tab('Save'), placeholder_text='Title', width=400)
@@ -200,7 +208,7 @@ class tabView (ctk.CTkTabview):
                 self.combo_command('blue')
                 self.button_color_dropdown.set('blue')
 
-########## tab 1 functions ##########
+########## gen tab functions ##########
     def copy(self):
         global mode
         temp = self.password_result.cget('text')
@@ -266,7 +274,7 @@ class tabView (ctk.CTkTabview):
 
 #####################################
 
-########## tab 2 functions ##########
+########## settings tab functions ##########
     global lower_var, upper_var, numbers_var, symbols_var, punctuation_var, brackets_var
 
     def combo_command(self,choice):
@@ -320,7 +328,7 @@ class tabView (ctk.CTkTabview):
                     file.write(content.replace('dark','light'))
 #####################################
 
-########## tab 3 funcitons ##########
+########## save tab funcitons ##########
     def expand_button(self):
         w = self.file_button.cget('width')           #
         segw = self.fileSegButton.cget('width')      # get some params that i'll need
