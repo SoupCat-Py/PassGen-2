@@ -344,6 +344,7 @@ class tabView (ctk.CTkTabview):
 
     def collapse_button(self):
         # switch to button
+        self.fileSegButton.set('none')
         self.fileSegButton.grid_forget()
         self.file_button.grid(row=3,column=0,padx=10,pady=10)
         w = self.file_button.cget('width')
@@ -458,7 +459,7 @@ class tabView (ctk.CTkTabview):
         self.path_label.configure(text=f'Current path: {path}')
 
         # confirm to user
-        self.file_button.configure(text='Done')
+        self.file_button.configure(text='✓')
         self.after(2000, lambda: self.file_button.configure(text='File...'))
         options = self.fileSegButton.cget('values')
         if 'Open' not in options:
