@@ -5,9 +5,6 @@ import pyperclip as ppc
 import tkinter as tk
 import random, os, sys
 
-global path
-path = None
-
 codes = ['#ff0000', '#ff1b00', '#ff5200', '#ff6e00', '#ffa500', '#ffa500', '#ffc300', '#ffd200',  '#fff000', '#ffff00', '#e1f707', '#c4f00e', '#89e21c', '#6cdb23', '#32cd32', '#32cd32', '#32cd32', '#32cd32', '#32cd32', '#32cd32', '#32cd32', '#32cd32', '#32cd32']
 
 color_dict = {'red': '#ff0000',
@@ -62,9 +59,9 @@ def writable_path(relative_path):
 
 def initialize_writable_files():
     # Copy writable files to user directory if not already present.
-    files_to_copy = ['settings.txt']
+    files_to_copy = ['settings.txt', 'path.txt']
     for file in files_to_copy:
-        source_path = resource_path(file)
+        source_path = resource_path(f'Text/{file}')
         dest_path = writable_path(file)
         if not os.path.exists(dest_path):
             try:
@@ -74,6 +71,30 @@ def initialize_writable_files():
                 msg.showerror('Unexpected Error!', f'Error copying {file}: {e}')
 
 initialize_writable_files()
+
+
+path = None
+def read_path():   
+    path_path = writable_path('path.txt')
+    try:
+        with open(path_path, 'r') as file:
+            content = file.read()
+            if content == '':
+                content = None
+    except:
+        content = None
+    return content
+def write_path(new_path):
+    path_path = writable_path('path.txt')
+    with open(path_path, 'r') as file:
+        content = file.read()
+        with open(path_path, 'w') as file:
+            print(content)
+            print(new_path)
+            file.write(content.replace(content, new_path))
+            app.tab_view.path_label.configure(text=f'current path: {path}')
+
+path = read_path()
 ########################
 
 # tabview class
@@ -124,7 +145,7 @@ class tabView (ctk.CTkTabview):
 
         ########## settings tab init ##########
         # vars for settings
-        global lower_var, upper_var, numbers_var, symbols_var, punctuation_var, brackets_var, list_dict
+        global lower_var, upper_var, numbers_var, symbols_var, punctuation_var, brackets_var, list_dict, path
         upper_var = ctk.StringVar(value=True)
         lower_var = ctk.StringVar(value=True)
         numbers_var = ctk.StringVar(value=True)
@@ -180,13 +201,18 @@ class tabView (ctk.CTkTabview):
 
 
         ########## save tab init ##########
+        path = read_path()
         # widgets
         self.spacer = ctk.CTkLabel(       master=self.tab('Save'), text='', height=30)
         self.title_entry = ctk.CTkEntry(  master=self.tab('Save'), placeholder_text='Title', width=400)
         self.save_button = ctk.CTkButton( master=self.tab('Save'), text='Save', font=('Helvetica', 20), text_color_disabled=hover_dict[self.button_color_dropdown.get()], height=40, corner_radius=20, command=self.save, state='disabled')
         self.file_button = ctk.CTkButton( master=self.tab('Save'), text='File...', width=75, command=self.expand_button)
         self.fileSegButton = ctk.CTkSegmentedButton(master = self.tab('Save'), values=['New','Choose'], command=self.segCallback)
-        self.path_label = ctk.CTkLabel(   master=self.tab('Save'), text='no file path chosen', font=('Courier', 10))
+        if path is not None:
+            self.path_label = ctk.CTkLabel(   master=self.tab('Save'), text=path, font=('Courier', 10))
+            self.fileSegButton.insert(2, 'Open')
+        else:
+            self.path_label = ctk.CTkLabel(   master=self.tab('Save'), text='No path chosen', font=('Courier', 10))
 
         # placement
         self.spacer.grid(      row=0,column=0, sticky='ew')
@@ -194,8 +220,6 @@ class tabView (ctk.CTkTabview):
         self.save_button.grid( row=2,column=0, padx=10,pady=10, sticky='nsew')
         self.file_button.grid( row=3,column=0, padx=10,pady=10)
         self.path_label.grid(  row=4,column=0, padx=10,pady=10, sticky='sew')
-
-
 
         # set color based on file
         settings_path = writable_path('settings.txt')
@@ -207,6 +231,10 @@ class tabView (ctk.CTkTabview):
             except:
                 self.combo_command('blue')
                 self.button_color_dropdown.set('blue')
+#######################################
+
+
+
 
 ########## gen tab functions ##########
     def copy(self):
@@ -404,16 +432,16 @@ class tabView (ctk.CTkTabview):
                     msg.showerror('Error!', 'Please select a .txt file')
                     path = None
                 elif '.txt' in path:
-                    options = self.fileSegButton.cget('values')
-                    if 'Open' not in options:
-                        self.fileSegButton.insert(2,'Open')
+                    options = self.fileSegButton.cget('values')  # get the values of the segButton
+                    if 'Open' not in options:                    # if 'Open' isnt there
+                        self.fileSegButton.insert(2,'Open')      # add 'Open
+                    write_path(path)                             # write the new path in path.txt
             else:
                 pass
-            self.path_label.configure(text=f'Current path: {path}')
 
     def open(self):
         global path
-        if path is not None:
+        if path is not None and os.path.exists(path):
             if sys.platform in ('win32', 'cygwin', 'msys', 'win64'): # windows
                 os.startfile(path)
             elif sys.platform == 'darwin': # macOS
@@ -421,6 +449,8 @@ class tabView (ctk.CTkTabview):
                 subprocess.Popen(['open', path])
             else: #linux
                 subprocess.Popen(["xdg-open", file_path])
+        else:
+            msg.showerror('Error','Can\'t open a file you deleted 😛')
 
 
     def makeNew(self):
@@ -453,10 +483,10 @@ class tabView (ctk.CTkTabview):
         # set path with new name
         newPath = join(newFileName)
 
-        # open file and show new path
+        # open file and write in path.txt
         newFile = open(newPath, 'a')
         path = newPath
-        self.path_label.configure(text=f'Current path: {path}')
+        write_path(path)
 
         # confirm to user
         self.file_button.configure(text='✓')
