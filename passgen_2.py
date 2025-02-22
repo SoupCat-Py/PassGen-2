@@ -9,35 +9,35 @@ import random, os, sys
 
 codes = ['#ff0000', '#ff1b00', '#ff5200', '#ff6e00', '#ffa500', '#ffa500', '#ffc300', '#ffd200',  '#fff000', '#ffff00', '#e1f707', '#c4f00e', '#89e21c', '#6cdb23', '#32cd32', '#32cd32', '#32cd32', '#32cd32', '#32cd32', '#32cd32', '#32cd32', '#32cd32', '#32cd32']
 
-color_dict = {'red': '#ff0000',
-             'orange': '#ff5200',
-             'yellow': '#f5ac00',
-             'green': '#0fba2e',
-             'blue': '#2c62c7',
-             'purple': '#a302a3',
-             'pink' : '#bf0a7d'}
+color_dict = {'red'   : '#ff0000',
+             'orange' : '#ff5200',
+             'yellow' : '#f5ac00',
+             'green'  : '#0fba2e',
+             'blue'   : '#2c62c7',
+             'purple' : '#a302a3',
+             'pink'   : '#bf0a7d'}
 
-hover_dict = {'red': '#cc0202',
+hover_dict = {'red'   : '#cc0202',
               'orange': '#d94602',
               'yellow': '#d19302',
-              'green': '#08751c',
-              'blue': '#124982',
+              'green' : '#08751c',
+              'blue'  : '#124982',
               'purple': '#800080',
-              'pink' : '#9c0665'}
+              'pink'  : '#9c0665'}
 
-text_dict = {'red': 'white',
+text_dict = {'red'   : 'white',
              'orange': 'white',
              'yellow': 'black',
-             'green': 'white',
-             'blue': 'white',
+             'green' : 'white',
+             'blue'  : 'white',
              'purple': 'white',
-             'pink' : 'white'}
+             'pink'  : 'white'}
 
-lower = ['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', 'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', 'z', 'x', 'c', 'v', 'b', 'n', 'm']
-upper = ['Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P', 'A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L', 'Z', 'X', 'C', 'V', 'B', 'N', 'M']
-numbers = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0']
-symbols = ['~', '@', '#', '$', '%', '^', '&', '*', '/', '\\', '<', '>', '-', '_', '+', '=', '|']
-brackets = ['(', ')', '[', ']', '{', '}']
+lower       = ['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', 'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', 'z', 'x', 'c', 'v', 'b', 'n', 'm']
+upper       = ['Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P', 'A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L', 'Z', 'X', 'C', 'V', 'B', 'N', 'M']
+numbers     = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0']
+symbols     = ['~', '@', '#', '$', '%', '^', '&', '*', '/', '\\', '<', '>', '-', '_', '+', '=', '|']
+brackets    = ['(', ')', '[', ']', '{', '}']
 punctuation = [':', ',', '.', '!', '?']
 lists = []
 
