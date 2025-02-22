@@ -8,12 +8,12 @@ import random, os, sys
 codes = ['#ff0000', '#ff1b00', '#ff5200', '#ff6e00', '#ffa500', '#ffa500', '#ffc300', '#ffd200',  '#fff000', '#ffff00', '#e1f707', '#c4f00e', '#89e21c', '#6cdb23', '#32cd32', '#32cd32', '#32cd32', '#32cd32', '#32cd32', '#32cd32', '#32cd32', '#32cd32', '#32cd32']
 
 color_dict = {'red': '#ff0000',
-               'orange': '#ff5200',
-               'yellow': '#f5ac00',
-               'green': '#0fba2e',
-               'blue': '#2c62c7',
-               'purple': '#a302a3',
-               'pink' : '#bf0a7d'}
+              'orange': '#ff5200',
+             'yellow': '#f5ac00',
+             'green': '#0fba2e',
+             'blue': '#2c62c7',
+             'purple': '#a302a3',
+             'pink' : '#bf0a7d'}
 
 hover_dict = {'red': '#cc0202',
               'orange': '#d94602',
