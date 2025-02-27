@@ -1,28 +1,25 @@
-import tkinter.messagebox as msg
-from tkinter import filedialog
-import customtkinter as ctk
-import webbrowser as web
-import pyperclip as ppc
-from PIL import Image
-import tkinter as tk
-import random, os, sys
+import tkinter.messagebox as msg  # error messages
+from tkinter import filedialog    # user-selected file
+import customtkinter as ctk       # GUI
+import webbrowser as web          # opening google
+import pyperclip as ppc           # copying
+from PIL import Image             # icons
+import tkinter as tk              # I think this is for the contextmenu
+import random, os, sys            # other utilities
 
 ### NEXT UP: ###
-# fix open being there by when no path
 # sound effects
 # maybe some more UI animations
-# more customization?
-# add to google
 
 codes = ['#ff0000', '#ff1b00', '#ff5200', '#ff6e00', '#ffa500', '#ffa500', '#ffc300', '#ffd200',  '#fff000', '#ffff00', '#e1f707', '#c4f00e', '#89e21c', '#6cdb23', '#32cd32', '#32cd32', '#32cd32', '#32cd32', '#32cd32', '#32cd32', '#32cd32', '#32cd32', '#32cd32']
 
 color_dict = {'red': '#ff0000',
-               'orange': '#ff5200',
-               'yellow': '#f5ac00',
-               'green': '#0fba2e',
-               'blue': '#2c62c7',
-               'purple': '#a302a3',
-               'pink' : '#bf0a7d'}
+              'orange': '#ff5200',
+              'yellow': '#f5ac00',
+              'green': '#0fba2e',
+              'blue': '#2c62c7',
+              'purple': '#a302a3',
+              'pink' : '#bf0a7d'}
 
 hover_dict = {'red': '#cc0202',
               'orange': '#d94602',
@@ -40,11 +37,11 @@ text_dict = {'red': 'white',
              'purple': 'white',
              'pink' : 'white'}
 
-lower = ['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', 'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', 'z', 'x', 'c', 'v', 'b', 'n', 'm']
-upper = ['Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P', 'A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L', 'Z', 'X', 'C', 'V', 'B', 'N', 'M']
-numbers = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0']
-symbols = ['~', '@', '#', '$', '%', '^', '&', '*', '/', '\\', '<', '>', '-', '_', '+', '=', '|']
-brackets = ['(', ')', '[', ']', '{', '}']
+lower =       ['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', 'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', 'z', 'x', 'c', 'v', 'b', 'n', 'm']
+upper =       ['Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P', 'A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L', 'Z', 'X', 'C', 'V', 'B', 'N', 'M']
+numbers =     ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0']
+symbols =     ['~', '@', '#', '$', '%', '^', '&', '*', '/', '\\', '<', '>', '-', '_', '+', '=', '|']
+brackets =    ['(', ')', '[', ']', '{', '}']
 punctuation = [':', ',', '.', '!', '?']
 lists = []
 
