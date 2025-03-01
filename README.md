@@ -1,4 +1,4 @@
-# Notice: only on mac until 2.3 is done
+# Notice: only on mac until 2.2 is done
 <h2>What it does:</h2>
 PassGen creates strong passwords with varying length and content. <br />
 
