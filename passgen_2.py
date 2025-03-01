@@ -100,8 +100,6 @@ def write_path(new_path):
     with open(path_path, 'r') as file:
         content = file.read()
         with open(path_path, 'w') as file:
-            print(content)
-            print(new_path)
             file.write(content.replace(content, new_path))
             app.tab_view.path_label.configure(text=f'current path: {path}')
 
@@ -216,18 +214,7 @@ class tabView (ctk.CTkTabview):
         # widgets
         self.spacer = ctk.CTkLabel(       master=self.tab('Save'), text='', height=30)
         self.title_entry = ctk.CTkEntry(  master=self.tab('Save'), placeholder_text='Title', width=400)
-        self.save_button = ctk.CTkButton( master=self.tab('Save'), text='Save', font=('Helvetica', 20), text_color_disabled=hover_dict[self.button_color_dropdown.get()], width=250, height=40, corner_radius=20, command=self.save, state='disabled')
-        self.google_button=ctk.CTkButton(master=self.tab('Save'), text='', width=80, height=40, corner_radius=20, command=self.open_google, state='disabled')
-        
-        try: # failsafe
-            google_path_white = resource_path('Images/google_white.png')
-            google_path_black = resource_path('Images/google_black.png')
-            self.google_icon_white = ctk.CTkImage(light_image=Image.open(google_path_white), dark_image=Image.open(google_path_white), size=(20,20))
-            self.google_icon_black = ctk.CTkImage(light_image=Image.open(google_path_black), dark_image=Image.open(google_path_black), size=(20,20))
-            self.google_button.configure(image=self.google_icon_white)
-        except:
-            pass
-
+        self.save_button = ctk.CTkButton( master=self.tab('Save'), text='Save', font=('Helvetica', 20), text_color_disabled=hover_dict[self.button_color_dropdown.get()], width=400, height=40, corner_radius=20, command=self.save, state='disabled')
         self.file_button = ctk.CTkButton( master=self.tab('Save'), text='File...', width=75, command=self.expand_button)
         self.fileSegButton = ctk.CTkSegmentedButton(master = self.tab('Save'), values=['New','Choose'], command=self.segCallback)
         if path is not None:
@@ -237,12 +224,11 @@ class tabView (ctk.CTkTabview):
             self.path_label = ctk.CTkLabel(   master=self.tab('Save'), text='No path chosen', font=('Courier', 10))
 
         # placement
-        self.spacer.grid(       row=0,column=0, columnspan=2, sticky='ew')
-        self.title_entry.grid(  row=1,column=0, columnspan=2, padx=30,pady=10, sticky='ew')
-        self.save_button.grid(  row=2,column=0, columnspan=1, padx=3,pady=10, sticky='e')
-        self.google_button.grid(row=2,column=1, columnspan=1, padx=3,pady=10, sticky='w')
-        self.file_button.grid(  row=3,column=0, columnspan=2, padx=10,pady=10)
-        self.path_label.grid(   row=4,column=0, columnspan=2, padx=10,pady=10, sticky='sew')
+        self.spacer.grid(       row=0,column=0, sticky='ew')
+        self.title_entry.grid(  row=1,column=0, padx=30,pady=10, sticky='ew')
+        self.save_button.grid(  row=2,column=0, padx=3,pady=10, sticky='ns')
+        self.file_button.grid(  row=3,column=0, padx=10,pady=10)
+        self.path_label.grid(   row=4,column=0, padx=10,pady=10, sticky='sew')
 
         # set color based on file
         settings_path = writable_path('settings.txt')
@@ -345,7 +331,6 @@ class tabView (ctk.CTkTabview):
         config(self.check_punctuation, False)
         config(self.check_symbols,     False)
 
-        config(self.google_button,     True)
         config(self.save_button,       True)
         config(self.file_button,       True)
 
@@ -353,12 +338,6 @@ class tabView (ctk.CTkTabview):
         self.configure(segmented_button_selected_color=color_dict[choice], segmented_button_selected_hover_color=hover_dict[choice], text_color=text_dict[choice])
         self.dark_switch.configure(progress_color=color_dict[choice])
         self.fileSegButton.configure(unselected_hover_color=color_dict[choice], text_color=text_dict[choice])
-
-        # google icon
-        if choice == 'yellow':
-            self.google_button.configure(image=self.google_icon_black)
-        else:
-            self.google_button.configure(image=self.google_icon_white)
 
         # write in file
         settings_path = writable_path('settings.txt')
@@ -525,10 +504,6 @@ class tabView (ctk.CTkTabview):
         options = self.fileSegButton.cget('values')
         if 'Open' not in options:
             self.fileSegButton.insert(2,'Open')
-
-    def open_google(self):
-        self.copy()
-        web.open_new_tab('https://passwords.google.com')
 
 #####################################
 
