@@ -3,7 +3,6 @@ from tkinter import filedialog    # user-selected file
 import customtkinter as ctk       # GUI
 import webbrowser as web          # opening google
 import pyperclip as ppc           # copying
-from PIL import Image             # icons
 import tkinter as tk              # I think this is for the contextmenu
 import random, os, sys            # other utilities
 
