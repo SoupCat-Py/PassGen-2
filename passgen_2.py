@@ -1,7 +1,6 @@
 import tkinter.messagebox as msg  # error messages
 from tkinter import filedialog    # user-selected file
 import customtkinter as ctk       # GUI
-import webbrowser as web          # opening google
 import pyperclip as ppc           # copying
 import tkinter as tk              # I think this is for the contextmenu
 import random, os, sys            # other utilities
@@ -275,7 +274,6 @@ class tabView (ctk.CTkTabview):
         global length, lists, context_menu, list_dict
 
         self.save_button.configure(state='normal')  # enable save button
-        self.google_button.configure(state='normal')
         context_menu.entryconfig('Copy', state='normal')  #
         context_menu.entryconfig('Save', state='normal')  # enabled context menu
 
