@@ -2,12 +2,10 @@ import tkinter.messagebox as msg  # error messages
 from tkinter import filedialog    # user-selected file
 import customtkinter as ctk       # GUI
 import pyperclip as ppc           # copying
-import tkinter as tk              # I think this is for the contextmenu
+import tkinter as tk              # contextmenu
 import random, os, sys            # other utilities
 
-### NEXT UP: ###
-# sound effects
-# maybe some more UI animations
+
 
 codes = ['#ff0000', '#ff1b00', '#ff5200', '#ff6e00', '#ffa500', '#ffa500', '#ffc300', '#ffd200',  '#fff000', '#ffff00', '#e1f707', '#c4f00e', '#89e21c', '#6cdb23', '#32cd32', '#32cd32', '#32cd32', '#32cd32', '#32cd32', '#32cd32', '#32cd32', '#32cd32', '#32cd32']
 
@@ -43,7 +41,7 @@ brackets =    ['(', ')', '[', ']', '{', '}']
 punctuation = [':', ',', '.', '!', '?']
 lists = []
 
-##### FILE MANAGEMENT #####
+######### FILE MANAGEMENT #########
 def resource_path(relative_path):
     # Get absolute path to resource, works for dev and for PyInstaller/cx_Freeze.
     try:
@@ -102,7 +100,7 @@ def write_path(new_path):
             app.tab_view.path_label.configure(text=f'current path: {path}')
 
 path = read_path()
-########################
+############################
 
 # tabview class
 class tabView (ctk.CTkTabview):
@@ -115,7 +113,7 @@ class tabView (ctk.CTkTabview):
         self.add('Save')
         self.set('Generate')
 
-        ########## gen tab init ##########
+########## gen tab init ##########
         # widgets
         global mode
         if mode == 'dark':
@@ -147,10 +145,10 @@ class tabView (ctk.CTkTabview):
         else: # windows and linux
             self.password_result.bind('<Button-3>', show_context_menu)
 
-        ################################
+#######################################
 
 
-        ########## settings tab init ##########
+########## settings tab init ##########
         # vars for settings
         global lower_var, upper_var, numbers_var, symbols_var, punctuation_var, brackets_var, list_dict, path
         upper_var = ctk.StringVar(value=True)
@@ -204,10 +202,10 @@ class tabView (ctk.CTkTabview):
         self.dark_switch.grid(           row=1,column=4, padx=10,pady=10, sticky='ew')
         self.button_color_label.grid(    row=2,column=4, padx=10,pady=5,  sticky='sew')
         self.button_color_dropdown.grid( row=3,column=4, padx=10,pady=5,  sticky='new')
-        ################################
+###################################
 
 
-        ########## save tab init ##########
+########## save tab init ##########
         path = read_path()
         # widgets
         self.spacer = ctk.CTkLabel(       master=self.tab('Save'), text='', height=30)
@@ -307,7 +305,7 @@ class tabView (ctk.CTkTabview):
         else:
             self.master.resetGeometry()
 
-#####################################
+############################################
 
 ########## settings tab functions ##########
     global lower_var, upper_var, numbers_var, symbols_var, punctuation_var, brackets_var
@@ -355,13 +353,15 @@ class tabView (ctk.CTkTabview):
                 mode = 'dark'
                 with open (settings_path, 'w') as file:
                     file.write(content.replace('light','dark'))
+
             elif value == 0:
                 ctk.set_appearance_mode('light')
                 self.password_result.configure(text_color='black', hover_color='#B1B1B1')
                 mode = 'light'
                 with open (settings_path, 'w') as file:
                     file.write(content.replace('dark','light'))
-#####################################
+
+########################################
 
 ########## save tab funcitons ##########
     def expand_button(self):
