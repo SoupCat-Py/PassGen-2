@@ -5,8 +5,6 @@ import pyperclip as ppc           # copying
 import tkinter as tk              # contextmenu
 import random, os, sys            # other utilities
 
-
-
 codes = ['#ff0000', '#ff1b00', '#ff5200', '#ff6e00', '#ffa500', '#ffa500', '#ffc300', '#ffd200',  '#fff000', '#ffff00', '#e1f707', '#c4f00e', '#89e21c', '#6cdb23', '#32cd32', '#32cd32', '#32cd32', '#32cd32', '#32cd32', '#32cd32', '#32cd32', '#32cd32', '#32cd32']
 
 color_dict = {'red': '#ff0000',
