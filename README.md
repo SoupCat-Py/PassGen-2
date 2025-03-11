@@ -4,7 +4,7 @@ PassGen creates strong passwords with varying length and content. <br />
 You can copy these passwords *and* save them to a `.txt` file.
 
 <h2>How it works:</h2>
-When you click "Generate," the program chooses random characters from a variety of lists that you can choose from, <br />
+When you click "Generate," the program chooses random characters from a variety of lists that you can choose from,
 such as lowercase/uppercase letters, symbols, and numbers.
 
 You can also move the slider to modify the length of the password (6-30 characters). 
