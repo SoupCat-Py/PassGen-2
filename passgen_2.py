@@ -147,7 +147,7 @@ class tabView (ctk.CTkTabview):
 
 ########## faker tab init #############
         # widgets
-        self.faker_output = ctk.CTkButton(          master=self.tab('Faker'), text='Fake Data Output', font=('Courier',30),
+        self.faker_output = ctk.CTkButton(          master=self.tab('Faker'), text='Fake Name', font=('Courier',30),
                                           fg_color='transparent', hover_color=hover_color_output, corner_radius=50, command=self.copy_fake)
         self.faker_generate_button = ctk.CTkButton( master=self.tab('Faker'), text='Generate!', width=200, height=40, corner_radius=20, command=self.faker_generate)
         self.faker_set_dropdown = ctk.CTkOptionMenu(master=self.tab('Faker'), values=['Name','Email','Phone','Address','Username'], command=self.faker_set)
@@ -412,6 +412,7 @@ class tabView (ctk.CTkTabview):
             if value == 1:
                 ctk.set_appearance_mode('dark')
                 self.password_result.configure(text_color='white', hover_color='#404040')
+                self.faker_output.configure(text_color='white', hover_color='#404040')
                 mode = 'dark'
                 with open (settings_path, 'w') as file:
                     file.write(content.replace('light','dark'))
@@ -419,6 +420,7 @@ class tabView (ctk.CTkTabview):
             elif value == 0:
                 ctk.set_appearance_mode('light')
                 self.password_result.configure(text_color='black', hover_color='#B1B1B1')
+                self.faker_output.configure(text_color='black', hover_color='#B1B1B1')
                 mode = 'light'
                 with open (settings_path, 'w') as file:
                     file.write(content.replace('dark','light'))
