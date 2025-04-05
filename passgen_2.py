@@ -6,6 +6,8 @@ import tkinter as tk              # contextmenu
 import random, os, sys, faker
 from contextlib import suppress
 
+# version 2.2.1
+
 codes = ['#ff0000', '#ff1b00', '#ff5200', '#ff6e00', '#ffa500', '#ffa500', '#ffc300', '#ffd200',  '#fff000', '#ffff00', '#e1f707', '#c4f00e', '#89e21c', '#6cdb23', '#32cd32', '#32cd32', '#32cd32', '#32cd32', '#32cd32', '#32cd32', '#32cd32', '#32cd32', '#32cd32']
 
 color_dict = {'red': '#ff0000',
