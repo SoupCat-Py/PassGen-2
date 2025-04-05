@@ -3,7 +3,8 @@ from tkinter import filedialog    # user-selected file
 import customtkinter as ctk       # GUI
 import pyperclip as ppc           # copying
 import tkinter as tk              # contextmenu
-import random, os, sys            # other utilities
+import random, os, sys, faker
+from contextlib import suppress
 
 codes = ['#ff0000', '#ff1b00', '#ff5200', '#ff6e00', '#ffa500', '#ffa500', '#ffc300', '#ffd200',  '#fff000', '#ffff00', '#e1f707', '#c4f00e', '#89e21c', '#6cdb23', '#32cd32', '#32cd32', '#32cd32', '#32cd32', '#32cd32', '#32cd32', '#32cd32', '#32cd32', '#32cd32']
 
@@ -107,20 +108,19 @@ class tabView (ctk.CTkTabview):
 
         # create tabs
         self.add('Settings')
-        self.add('Generate')
+        self.add('Passwords')
+        self.add('Faker')
         self.add('Save')
-        self.set('Generate')
+        self.set('Passwords')
 
 ########## gen tab init ##########
         # widgets
         global mode
-        if mode == 'dark':
-            self.password_result = ctk.CTkButton( master=self.tab('Generate'), text='Click to copy', font=('Courier', 30), height=50, fg_color='transparent', hover_color='#404040', corner_radius=50, command=self.copy)
-        elif mode == 'light':
-            self.password_result = ctk.CTkButton( master=self.tab('Generate'), text='Click to copy', font=('Courier', 30), text_color='black', height=50, fg_color='transparent', hover_color='#B1B1B1', corner_radius=50, command=self.copy)
-        self.gen_button = ctk.CTkButton(      master=self.tab('Generate'), text='Generate!', font=('helvetica',15), width=350, height=40, corner_radius=40, command=self.generate)
-        self.len_label = ctk.CTkLabel(        master=self.tab('Generate'), text='Length: 16', font=('Courier', 15))
-        self.len_slider = ctk.CTkSlider(      master=self.tab('Generate'), from_=6, to=30, number_of_steps=26, progress_color='white', width=300, command=self.slider_command) # remember to change progress_color depending on value (red - green)
+        hover_color_output = '#404040' if mode == 'dark' else '#B1B1B1'
+        self.password_result = ctk.CTkButton( master=self.tab('Passwords'), text='Click to copy', font=('Courier', 30), height=50, fg_color='transparent', hover_color=hover_color_output, corner_radius=50, command=self.copy_password)
+        self.gen_button = ctk.CTkButton(      master=self.tab('Passwords'), text='Generate!', font=('helvetica',15), width=350, height=40, corner_radius=40, command=self.generate)
+        self.len_label = ctk.CTkLabel(        master=self.tab('Passwords'), text='Length: 16', font=('Courier', 15))
+        self.len_slider = ctk.CTkSlider(      master=self.tab('Passwords'), from_=6, to=30, number_of_steps=26, progress_color='white', width=300, command=self.slider_command) # remember to change progress_color depending on value (red - green)
         self.len_slider.set(16) # set default value
         self.slider_command(16) # set the length variable
 
@@ -136,7 +136,7 @@ class tabView (ctk.CTkTabview):
             # Popup the menu at mouse click position
             context_menu.post(event.x_root, event.y_root)
         context_menu = tk.Menu(self, tearoff=0)
-        context_menu.add_command(label='Copy', command=self.copy, state='disabled')
+        context_menu.add_command(label='Copy', command=self.copy_password, state='disabled')
         context_menu.add_command(label='Save', command=self.save, state='disabled')
         if sys.platform == 'darwin': # macOS
             self.password_result.bind('<Button-2>', show_context_menu)
@@ -144,6 +144,21 @@ class tabView (ctk.CTkTabview):
             self.password_result.bind('<Button-3>', show_context_menu)
 
 #######################################
+
+########## faker tab init #############
+        # widgets
+        self.faker_output = ctk.CTkButton(          master=self.tab('Faker'), text='Fake Data Output', font=('Courier',30),
+                                          fg_color='transparent', hover_color=hover_color_output, corner_radius=50, command=self.copy_fake)
+        self.faker_generate_button = ctk.CTkButton( master=self.tab('Faker'), text='Generate!', width=200, height=40, corner_radius=20, command=self.faker_generate)
+        self.faker_set_dropdown = ctk.CTkOptionMenu(master=self.tab('Faker'), values=['Name','Email','Phone','Address','Username'], command=self.faker_set)
+
+        # set default
+        self.faker_set_dropdown.set('Name')
+
+        # placement
+        self.faker_output.grid(   row=0,column=0, padx=20,pady=30, sticky='ew', columnspan=2)
+        self.faker_generate_button.grid(row=1,column=0, padx=20,pady=10, sticky='e')
+        self.faker_set_dropdown.grid(   row=1,column=1, padx=20,pady=10, sticky='w')
 
 
 ########## settings tab init ##########
@@ -168,9 +183,9 @@ class tabView (ctk.CTkTabview):
         #
         self.spacer2 = ctk.CTkLabel(master=self.tab('Settings'), text='|', font=('Times New Roman',140), text_color='#7F7F7F')
         #
-        self.dark_switch = ctk.CTkSwitch(             master=self.tab('Settings'), text='Dark Mode', command=self.switch_var)
-        self.button_color_label = ctk.CTkLabel(       master=self.tab('Settings'), text='Button color:')
-        self.button_color_dropdown = ctk.CTkComboBox( master=self.tab('Settings'), values=['red','orange','yellow','green','blue','purple', 'pink'], command=self.combo_command)
+        self.dark_switch = ctk.CTkSwitch(              master=self.tab('Settings'), text='Dark Mode', command=self.switch_var)
+        self.button_color_label = ctk.CTkLabel(        master=self.tab('Settings'), text='Button color:')
+        self.button_color_dropdown = ctk.CTkOptionMenu(master=self.tab('Settings'), values=['red','orange','yellow','green','blue','purple', 'pink'], command=self.combo_command)
         
         # set defaults
         self.check_brackets.select()
@@ -207,7 +222,7 @@ class tabView (ctk.CTkTabview):
         path = read_path()
         # widgets
         self.spacer = ctk.CTkLabel(       master=self.tab('Save'), text='', height=30)
-        self.title_entry = ctk.CTkEntry(  master=self.tab('Save'), placeholder_text='Title', width=400)
+        self.title_entry = ctk.CTkEntry(  master=self.tab('Save'), placeholder_text='Password Title', width=400)
         self.save_button = ctk.CTkButton( master=self.tab('Save'), text='Save', font=('Helvetica', 20), text_color_disabled=hover_dict[self.button_color_dropdown.get()], width=400, height=40, corner_radius=20, command=self.save, state='disabled')
         self.file_button = ctk.CTkButton( master=self.tab('Save'), text='File...', width=75, command=self.expand_button)
         self.fileSegButton = ctk.CTkSegmentedButton(master = self.tab('Save'), values=['New','Choose'], command=self.segCallback)
@@ -240,7 +255,7 @@ class tabView (ctk.CTkTabview):
 
 
 ########## gen tab functions ##########
-    def copy(self):
+    def copy_password(self):
         global mode
         temp = self.password_result.cget('text')
         if temp != 'Click to copy':
@@ -254,17 +269,15 @@ class tabView (ctk.CTkTabview):
     # when the slider is updated
     def slider_command(self, value):
         global length
-        if value < 10:
+        if value < 9:
             self.len_label.configure(text=f'Length: 0{round(value)} ')  # update len_label
         else:
             self.len_label.configure(text=f'Length: {round(value)}')  # update len_label
         length = round(value)   # set length for password generation
 
-        try:
+        with suppress(IndexError):
             index = codes[round(value)-6]  # get the index of the color
             self.len_slider.configure(button_color=index, button_hover_color=index, progress_color=index)  # change button color depending on value
-        except:
-            pass
 
     def generate(self):
         global length, lists, context_menu, list_dict
@@ -305,6 +318,54 @@ class tabView (ctk.CTkTabview):
 
 ############################################
 
+########## faker tab functions #############
+    def faker_generate(self):
+        global type
+        type = self.faker_set_dropdown.get()
+        fake = faker.Faker()
+
+        # set font size for address bc they get pretty long
+        font_size = 20 if type == 'Address' else 30
+        self.faker_output.configure(font=('courier',font_size))
+
+        # fake data generation
+        if type == 'Name':
+            output = fake.name()
+        elif type == 'Email':
+            output = fake.email()
+            while len(output) > 25:    # make sure the email isnt too long
+                output = fake.email()  #
+        elif type == 'Phone':
+            output = fake.basic_phone_number()
+        elif type == 'Address':
+            output = fake.address()
+        elif type == 'Username':
+            output = fake.user_name()
+        
+        # update label
+        self.faker_output.configure(text=output)
+
+    def faker_set(self, choice):
+        global type
+        # set font size for address bc they get pretty long
+        # also change the text
+        if type != choice:
+            font_size = 20 if choice == 'Address' else 30
+            text = '''Fake Address
+            ''' if choice == 'Address' else f'Fake {choice}'
+            self.faker_output.configure(text=text, font=('courier',font_size))
+
+    def copy_fake(self):
+        global type
+        temp = self.faker_output.cget('text')
+        if temp != 'Fake Data Output':
+            ppc.copy(temp)
+            text_copied = '''Copied!
+            ''' if type == 'Address' else 'Copied!'
+            self.faker_output.configure(text=text_copied, text_color='#00FF00')
+            text_color_output = 'white' if mode == 'dark' else 'black'
+            self.after(750, lambda: self.faker_output.configure(text=temp, text_color=text_color_output))
+
 ########## settings tab functions ##########
     global lower_var, upper_var, numbers_var, symbols_var, punctuation_var, brackets_var
 
@@ -324,13 +385,16 @@ class tabView (ctk.CTkTabview):
         config(self.check_punctuation, False)
         config(self.check_symbols,     False)
 
-        config(self.save_button,       True)
-        config(self.file_button,       True)
+        config(self.save_button,           True)
+        config(self.file_button,           True)
+        config(self.faker_generate_button, True)
 
         # special color configurations
-        self.configure(segmented_button_selected_color=color_dict[choice], segmented_button_selected_hover_color=hover_dict[choice], text_color=text_dict[choice])
-        self.dark_switch.configure(progress_color=color_dict[choice])
-        self.fileSegButton.configure(unselected_hover_color=color_dict[choice], text_color=text_dict[choice])
+        self.configure(                      segmented_button_selected_color=color_dict[choice], segmented_button_selected_hover_color=hover_dict[choice], text_color=text_dict[choice])
+        self.dark_switch.configure(          progress_color=color_dict[choice])
+        self.fileSegButton.configure(        unselected_hover_color=color_dict[choice], text_color=text_dict[choice])
+        self.faker_set_dropdown.configure(   fg_color=color_dict[choice], text_color=text_dict[choice], button_color=hover_dict[choice], button_hover_color=color_dict[choice])
+        self.button_color_dropdown.configure(fg_color=color_dict[choice], text_color=text_dict[choice], button_color=hover_dict[choice], button_hover_color=color_dict[choice])
 
         # write in file
         settings_path = writable_path('settings.txt')
