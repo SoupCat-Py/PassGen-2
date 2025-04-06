@@ -114,6 +114,8 @@ class tabView (ctk.CTkTabview):
         self.add('Faker')
         self.add('Save')
         self.set('Passwords')
+        
+        self._fg_color='transparent'
 
 ########## gen tab init ##########
         # widgets
@@ -149,13 +151,18 @@ class tabView (ctk.CTkTabview):
 
 ########## faker tab init #############
         # widgets
-        self.faker_output = ctk.CTkButton(          master=self.tab('Faker'), text='Fake Name', font=('Courier',30),
-                                          fg_color='transparent', hover_color=hover_color_output, corner_radius=50, command=self.copy_fake)
+        self.faker_output = ctk.CTkLabel(           master=self.tab('Faker'), text='Fake Name', font=('Courier',30), fg_color='transparent', corner_radius=50)
         self.faker_generate_button = ctk.CTkButton( master=self.tab('Faker'), text='Generate!', width=200, height=40, corner_radius=20, command=self.faker_generate)
         self.faker_set_dropdown = ctk.CTkOptionMenu(master=self.tab('Faker'), values=['Name','Email','Phone','Address','Username'], command=self.faker_set)
 
         # set default
         self.faker_set_dropdown.set('Name')
+        
+        # bindings
+        self.left_click = '<Button-1>' if sys.platform == 'darwin' else '<Button-0>'
+        self.faker_output.bind(self.left_click, lambda e: self.copy_fake())
+        self.faker_output.bind('<Enter>', lambda e: self.faker_output.configure(fg_color=hover_color_output))
+        self.faker_output.bind('<Leave>', lambda e: self.faker_output.configure(fg_color='transparent'))
 
         # placement
         self.faker_output.grid(   row=0,column=0, padx=20,pady=30, sticky='ew', columnspan=2)
@@ -260,7 +267,7 @@ class tabView (ctk.CTkTabview):
     def copy_password(self):
         global mode
         temp = self.password_result.cget('text')
-        if temp != 'Click to copy':
+        if temp != 'Click to copy' and temp != 'Copied!':
             ppc.copy(temp)
             self.password_result.configure(text='Copied!', text_color='#00FF00')
             if mode == 'dark':
@@ -360,7 +367,7 @@ class tabView (ctk.CTkTabview):
     def copy_fake(self):
         global type
         temp = self.faker_output.cget('text')
-        if temp != 'Fake Data Output':
+        if 'Fake' not in temp and temp != 'Copied!':
             ppc.copy(temp)
             text_copied = '''Copied!
             ''' if type == 'Address' else 'Copied!'
