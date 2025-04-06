@@ -115,7 +115,7 @@ class tabView (ctk.CTkTabview):
         self.add('Save')
         self.set('Passwords')
         
-        self._fg_color='transparent'
+        self.configure(fg_color='transparent')
 
 ########## gen tab init ##########
         # widgets
