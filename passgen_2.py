@@ -10,29 +10,16 @@ from contextlib import suppress
 
 codes = ['#ff0000', '#ff1b00', '#ff5200', '#ff6e00', '#ffa500', '#ffa500', '#ffc300', '#ffd200',  '#fff000', '#ffff00', '#e1f707', '#c4f00e', '#89e21c', '#6cdb23', '#32cd32', '#32cd32', '#32cd32', '#32cd32', '#32cd32', '#32cd32', '#32cd32', '#32cd32', '#32cd32']
 
-color_dict = {'red': '#ff0000',
-              'orange': '#ff5200',
-              'yellow': '#f5ac00',
-              'green': '#0fba2e',
-              'blue': '#2c62c7',
-              'purple': '#a302a3',
-              'pink' : '#bf0a7d'}
-
-hover_dict = {'red': '#cc0202',
-              'orange': '#d94602',
-              'yellow': '#d19302',
-              'green': '#08751c',
-              'blue': '#124982',
-              'purple': '#800080',
-              'pink' : '#9c0665'}
-
-text_dict = {'red': 'white',
-             'orange': 'white',
-             'yellow': 'black',
-             'green': 'white',
-             'blue': 'white',
-             'purple': 'white',
-             'pink' : 'white'}
+# 0 = color   1 = hover   2 = text
+colors_dict = {
+    'red'    : ['#ff0000','#cc0202','white'],
+    'orange' : ['#ff5200','#d94602','white'],
+    'yellow' : ['#f5ac00','#d19302','black'],
+    'green'  : ['#0fba2e','#08751c','white'],
+    'blue'   : ['#2c62c7','#124982','white'],
+    'purple' : ['#a302a3','#800080','white'],
+    'pink'   : ['#bf0a7d','#9c0665','white']
+}
 
 lower =       ['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', 'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', 'z', 'x', 'c', 'v', 'b', 'n', 'm']
 upper =       ['Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P', 'A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L', 'Z', 'X', 'C', 'V', 'B', 'N', 'M']
@@ -232,7 +219,7 @@ class tabView (ctk.CTkTabview):
         # widgets
         self.spacer = ctk.CTkLabel(       master=self.tab('Save'), text='', height=30)
         self.title_entry = ctk.CTkEntry(  master=self.tab('Save'), placeholder_text='Password Title', width=400)
-        self.save_button = ctk.CTkButton( master=self.tab('Save'), text='Save', font=('Helvetica', 20), text_color_disabled=hover_dict[self.button_color_dropdown.get()], width=400, height=40, corner_radius=20, command=self.save, state='disabled')
+        self.save_button = ctk.CTkButton( master=self.tab('Save'), text='Save', font=('Helvetica', 20), text_color_disabled=colors_dict[self.button_color_dropdown.get()][1], width=400, height=40, corner_radius=20, command=self.save, state='disabled')
         self.file_button = ctk.CTkButton( master=self.tab('Save'), text='File...', width=75, command=self.expand_button)
         self.fileSegButton = ctk.CTkSegmentedButton(master = self.tab('Save'), values=['New','Choose'], command=self.segCallback)
         if path is not None:
@@ -380,10 +367,10 @@ class tabView (ctk.CTkTabview):
 
     def combo_command(self,choice):
         def config(widget, text):
-            widget.configure(fg_color=color_dict[choice])
-            widget.configure(hover_color=hover_dict[choice])
+            widget.configure(fg_color=colors_dict[choice][0])
+            widget.configure(hover_color=colors_dict[choice][1])
             if text:
-                widget.configure(text_color=text_dict[choice])
+                widget.configure(text_color=colors_dict[choice][2])
         
         config(self.gen_button,        True)
 
@@ -399,11 +386,11 @@ class tabView (ctk.CTkTabview):
         config(self.faker_generate_button, True)
 
         # special color configurations
-        self.configure(                      segmented_button_selected_color=color_dict[choice], segmented_button_selected_hover_color=hover_dict[choice], text_color=text_dict[choice])
-        self.dark_switch.configure(          progress_color=color_dict[choice])
-        self.fileSegButton.configure(        unselected_hover_color=color_dict[choice], text_color=text_dict[choice])
-        self.faker_set_dropdown.configure(   fg_color=color_dict[choice], text_color=text_dict[choice], button_color=hover_dict[choice], button_hover_color=color_dict[choice])
-        self.button_color_dropdown.configure(fg_color=color_dict[choice], text_color=text_dict[choice], button_color=hover_dict[choice], button_hover_color=color_dict[choice])
+        self.configure(                      segmented_button_selected_color=colors_dict[choice][0], segmented_button_selected_hover_color=colors_dict[choice][1], text_color=colors_dict[choice][2])
+        self.dark_switch.configure(          progress_color=colors_dict[choice][0])
+        self.fileSegButton.configure(        unselected_hover_color=colors_dict[choice][0], text_color=colors_dict[choice][2])
+        self.faker_set_dropdown.configure(   fg_color=colors_dict[choice][0], text_color=colors_dict[choice][2], button_color=colors_dict[choice][1], button_hover_color=colors_dict[choice][0])
+        self.button_color_dropdown.configure(fg_color=colors_dict[choice][0], text_color=colors_dict[choice][2], button_color=colors_dict[choice][1], button_hover_color=colors_dict[choice][0])
 
         # write in file
         settings_path = writable_path('settings.txt')
@@ -458,7 +445,7 @@ class tabView (ctk.CTkTabview):
         w = self.file_button.cget('width')
         # collapse
         if w > 75:
-            self.file_button.configure(width=w-1, text_color=text_dict[self.button_color_dropdown.get()])
+            self.file_button.configure(width=w-1, text_color=colors_dict[self.button_color_dropdown.get()][2])
             self.after(1, self.collapse_button)
 
     def segCallback(self, value):
